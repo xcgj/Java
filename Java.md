@@ -15,38 +15,43 @@ Xcgj.java这个文件名需要匹配文件内部声明的类“Xcgj”
 
 ## eclipse操作
 
-Ctrl+Alt+/ 自动补全java关键字
-Alt+/ 启动代码辅助菜单
-Ctrl+1 代码修正
-F5 调试进入代码行
-F6 调试跳过代码行
+|快捷键|操作|
+|---|---|
+|Ctrl+Alt+/| 自动补全java关键字|
+|Alt+/| 启动代码辅助菜单|
+|Ctrl+1| 代码修正|
+|F5| 调试进入代码行|
+|F6| 调试跳过代码行|
 
 ## inteliJ IDEA操作
 
-Alt+Enter 自动导入包
-shift+f10 运行程序
+|快捷键|操作|
+|---|---|
+|Alt+Enter| 自动导入包|
+|shift+f10| 运行程序|
 
 ## 字符串
 
-str.length() 算长度
-str.indexOf(String) 查找第一个子串的位置
-str.lastIndxOf(String) 查找最后一个子串的位置
-str.charAt(int) 找指定位置的字符
-str.substring(int beginIndex) 获取子串
-str.substring(int beginIndex, int endIndex) 获取子串
-str.trim() 去除前后空格
-str.replace(char old, char new) 替换
-str.startsWith(String) 判断起始子串
-str.endsWith(string) 判断结束子串
-str.equals(String) 比较
-sre.equalsIgnoreCase(String) 比较忽略大小写
-==：比较两个字符串的地址是否相同
-str.compareTo(String s) 字典顺序比较str和s，str在s之前，返回-1；str在s之后，返回1；否则返回0
-str.toLowerCase() 转小写
-str.toUpperCase() 转大写
-str.split(String); 分割
-str.split(String, int); 分割并限定次数
-String.format(String format, ...) 格式化字符串
+- str.length() 算长度
+- str.indexOf(String) 查找第一个子串的位置
+- str.lastIndxOf(String) 查找最后一个子串的位置
+- str.charAt(int) 找指定位置的字符
+- str.substring(int beginIndex) 获取子串
+- str.substring(int beginIndex, int endIndex) 获取子串
+- str.trim() 去除前后空格
+- str.replace(char old, char new) 替换
+- str.startsWith(String) 判断起始子串
+- str.endsWith(string) 判断结束子串
+- str.equals(String) 比较
+- sre.equalsIgnoreCase(String) 比较忽略大小写
+- ==：比较两个字符串的地址是否相同
+- str.compareTo(String s) 字典顺序比较str和s，str在s之前，返回-1；str在s之后，返回1；否则返回0
+- str.toLowerCase() 转小写
+- str.toUpperCase() 转大写
+- str.split(String); 分割
+- str.split(String, int); 分割并限定次数
+- String.format(String format, ...) 格式化字符串
+
 格式化符参见书本P97-P100
 ![常用日期格式化转换符.png](常用日期格式化转换符.png)
 ![时间格式化转化符.png](时间格式化转化符.png)
@@ -58,21 +63,22 @@ String.format(String format, ...) 格式化字符串
 
 ## StringBuilder
 
-builder.append(anyType)
-builder.insert(int index, anyType)
-builder.delete(int startIndex, int endIndex)
-builder.toString()
+- builder.append(anyType)
+- builder.insert(int index, anyType)
+- builder.delete(int startIndex, int endIndex)
+- builder.toString()
 
 ## 数组
 
-import java.util.Arrays;
-Arrays.fill(arrayName, int val); 替换整个数组
-Arrays.fill(arrayName, int fromIndex, int toIndex, int val); 替换数组部分成员
-Arrays.sort(arrayName); 升序排列数组
-Arrays.copyOf(arrayName, int newlen) 拷贝数组
-Arrays.copyOfRange(arrayName, int fromIndex, int toIndex) 范围拷贝数组
-Arrays.binarySearch(arrayName,key); 二分法检索已排序的队列
-Arrays.binarySearch(arrayName,int fromIndex, int toIndex, key); 二分法范围检索已排序的队列
+- import java.util.Arrays;
+- Arrays.fill(arrayName, int val); 替换整个数组
+- Arrays.fill(arrayName, int fromIndex, int toIndex, int val); 替换数组部分成员
+- Arrays.sort(arrayName); 升序排列数组
+- Arrays.copyOf(arrayName, int newlen) 拷贝数组
+- Arrays.copyOfRange(arrayName, int fromIndex, int toIndex) 范围拷贝数组
+- Arrays.binarySearch(arrayName,key); 二分法检索已排序的队列
+- Arrays.binarySearch(arrayName,int fromIndex, int toIndex, key); 二分法范围检索已排序的队列
+
 >array中存在key则返回index，否则返回第一个大于key的index，"-"表示插入位置
 ```java
 import java.util.Arrays;
@@ -1011,7 +1017,8 @@ c01cpp
 - HashMap基于哈希表，用哈希码快速查找映射关系，效率高，键、值可为null
 - TreeMap性能较差，但插入时自动排序，键、值不能为null
 
-## 流
+## 文件操作
+
 - `InputStream`和`OutputStream`处理字节
 - `Reader`和`Writer`处理字符
 
@@ -1195,3 +1202,139 @@ public class xcgj {
 璧立千仞
 无欲则刚
 ```
+
+- 数据输入输出流
+
+以与机器无关的方式读取基本java数据类型，不关心字节
+```java
+import java.io.*;
+
+public class xcgj {
+    public static void main(String[] args){
+        try {
+            String fileName = new String("d:/test/c01cpp.txt");
+            FileInputStream fileInputStream = new FileInputStream(fileName);
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+
+//            dataOutputStream.writeBytes("writeBytes文件写入");//文件内容乱码
+//            System.out.println(dataInputStream.readByte());//显示乱码
+
+//            dataOutputStream.writeChars("的writeChars文件写入");//文件内容乱码
+//            System.out.println(dataInputStream.readChar());//显示单个字符
+
+            dataOutputStream.writeUTF("writeUTF文件写入");//文件内容乱码
+            System.out.println(dataInputStream.readUTF());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+```
+```
+writeUTF文件写入
+```
+
+- 文件压缩
+
+![压缩类方法.png](压缩类方法.png)
+```java
+import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class xcgj {
+    public static void zip(String zipName, File file) throws Exception{//若有异常，向上抛出
+        FileOutputStream fileOutputStream = new FileOutputStream(zipName);//文件
+        ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
+        zip(zipOutputStream, file, "");
+        zipOutputStream.close();
+    }
+
+    public static void zip(ZipOutputStream zipOutputStream, File file, String head)throws Exception{
+        if (file.isDirectory()){//目录，向下递归
+            File[] fileList = file.listFiles();//当前文件夹下的所有文件和文件夹
+            if (head.length() != 0){
+                zipOutputStream.putNextEntry(new ZipEntry(head + "/"));//创建新插入目录节点
+            }
+            for (File tempFile: fileList) {
+                zip(zipOutputStream, tempFile, head + tempFile);//递归
+            }
+         }
+        else {  //文件，读取并压缩
+            zipOutputStream.putNextEntry(new ZipEntry(head));   //创建新插入文件节点
+            FileInputStream fileInputStream = new FileInputStream(file);
+            int b;
+            while ((b = fileInputStream.read()) != -1){
+                zipOutputStream.write(b);       //插入文件压缩数据
+            }
+            fileInputStream.close();
+        }
+    }
+
+    public static void main(String[] args){
+        xcgj xg = new xcgj();
+        try {
+            xg.zip("D:/test.zip", new File("test"));
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+- 文件解压
+
+![解压类方法.png](解压类方法.png)
+
+```java
+import java.io.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
+public class xcgj {
+    public static void unzip(String zipPath, String dstPath) throws Exception{
+        //初始化文件操作对象
+        File file = new File(zipPath);
+        ZipFile zipFile = new ZipFile(file);
+        FileInputStream fileInputStream = new FileInputStream(file);
+        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
+
+        //找到文件节点，循环解压
+        ZipEntry zipEntry = null;
+        while (null != (zipEntry = zipInputStream.getNextEntry()) && false == zipEntry.isDirectory()){
+            File tempFile = new File(dstPath + zipEntry.getName());
+            if (tempFile.exists() == false){//存在同名根目录就不解压
+                tempFile.getParentFile().mkdirs();
+                OutputStream outputStream = new FileOutputStream(tempFile);//文件目录中的文件放入输入流
+                InputStream inputStream = zipFile.getInputStream(zipEntry);//输入流读取压缩文件中指定目录中的文件
+                int count = 0;
+                while ((count = inputStream.read()) != -1){
+                    outputStream.write(count);
+                }
+                outputStream.close();
+                inputStream.close();
+            }
+        }
+        zipInputStream.close();
+    }
+
+    public static void main(String[] args){
+        xcgj xg = new xcgj();
+        try {
+            xg.unzip("D:/test.zip", "D:/unzipTest/");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+## 反射
+
+反射就是通过一个类实例对象，通过一些方法查询这个对象所属的类的相关消息。
