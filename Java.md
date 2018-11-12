@@ -335,6 +335,11 @@ public class mainRun {
 }
 ```
 
+- 当用黑窗口运行含有包的`.class`文件时，要注意黑窗口的执行路径。如：
+    - `server.java`源文件的里声明了`package Server;`
+    - `server.class`文件所在路径为：`D:\Server\`
+    - 那么黑窗口需要在`D:\`下运行：`java Server.server`
+
 ## final
 
 - final:
@@ -1338,3 +1343,656 @@ public class xcgj {
 ## 反射
 
 反射就是通过一个类实例对象，通过一些方法查询这个对象所属的类的相关消息。
+- getFields()和getMethods()方法依次获得权限为public的成员变量和成员方法时，将包含从超类中继承得到的成员变量和方法。
+- getDeclaredFields()和getDeclaredMethods()只是获得在本类中定义的所有成员变量和方法
+- 访问构造方法：返回Constructor类型的对象或数组
+- 访问变量：返回Field类型的对象或数组
+- 访问方法：返回Method类型的对象或数组
+- Annotation功能只是给程序添加注释，不影响程序的运行。程序运行时可以通过Annotation功能访问到类、构造方法、成员变量、成员方法、参数等的说明
+- Annotation的关键子：@interface
+- 注解详细介绍：https://www.cnblogs.com/xdp-gacl/p/3622275.html
+
+## 枚举与泛型
+
+### 枚举
+
+- 每一个枚举类型成员都可以看作是枚举类型的一个实例
+- 枚举类型成员可以有构造方法，枚举类型可以有成员方法和成员变量
+- 枚举类型可以继承接口，这样每个枚举类型成员都要实现接口里的方法
+
+### 泛型
+
+- `public class Tclass<T1, T2>{}` 泛型类
+- 限制泛型可用类型： `public class Tclass<T externs List>{}`, 设置泛型类型必须是List或List的子类
+- 通配符按照包含范围划分可以分为三种：
+    - 无界通配符，也就是 <?> 这种表示形式，含义是表示全部实参集合中的任意一种实参类型；
+    - 上界通配符，用 externs 关键字确定上界， 类似 <? externs Number> 可以表示包含 Number 以及其所有子类的类型组成的集合中的任何一种实参类型（注意这里的 extends 关键字并不是我们常见的继承的含义，他只是复用 extends 关键字来界定范围）；
+    - 下界通配符，用 super 关键字确定下界，类似 <? super Number> 可以表示包含 Numbe r以及其所有父类的类型组成的集合中的任何一种实参类型。
+
+    >但是使用上下限界配符通也会有限制，例如用上界 ArrayList<? externs Number> list = new ArrayList<Long> () 定义的 list，我们调用 list.get() 往外取数据是可以的，因为编译器知道取出来的数据一定是 Numbe r的子类，但是 __当我们要往其中添加数据时，例如 list.add(1L)，编译器是不允许这种操作的__ ，原因是 ArrayList<? externs Number> 对于编译器来说，它并不能确定其真实代表的实参是哪一种子类，这样不能保证类型安全。
+
+## 线程
+
+### 线程的实现方式
+- 继承Thread类
+
+```java
+package ThreadTest;
+
+public class threadTest extends Thread {
+    public void run(){
+        //执行线程任务
+        //while (true) {...}
+    }
+
+    public static void main(String[] args) {
+        threadTest threadtest = new threadTest();
+        threadtest.start();//启动线程
+    }
+}
+```
+
+- 实现Runnable接口——解决多重继承的问题
+    - 建立Runnable对象
+    - 使用Runnable对象作为参数建立Thread实例
+    - 使用start()方法启动线程
+
+```java
+public class tnreadRunnable extends JFrame implements Runnable{
+    public void run(){}
+}
+```
+
+```java
+package ThreadTest;
+import javax.swing.*;
+
+public class tnreadRunnable extends JFrame{//继承窗口类
+    Thread thread;
+    public void startRun() {
+        thread = new Thread(new Runnable() {//实现Runnable接口
+            @Override
+            public void run() {
+                //执行线程任务
+                //while (true) {...}
+            }
+        });
+        thread.start();//启动线程
+    }
+
+    public static void main(String[] args){
+        tnreadRunnable tnreadrunnable = new tnreadRunnable();
+        tnreadrunnable.startRun();
+    }
+}
+```
+
+- 线程的生命周期
+    - 出生状态：调用start()方法之前
+    - 就绪状态：调用start()方法之后，等待CPU时间片
+    - 运行(可执行)状态：得到系统资源，获得CPU时间片
+    - 等待状态：调用wait()方法后，需要用notify()或notifyAll()或interrupt()方法唤醒
+    - 休眠状态：调用sleep()方法后，interrupt()方法或休眠结束可唤醒
+    - 阻塞状态：发出输入/输出请求后
+    - 死亡状态：run()方法执行完毕
+
+![线程生命周期.png](线程生命周期.png)
+
+### 线程的操作方法
+- Thread.sleep() 休眠
+- B线程使用B.join()加入A线程时，A线程会等待B线程运行完毕后再运行
+
+```java
+package ThreadTest;
+
+public class JoinTest {
+    private Thread threadA;
+    private Thread threadB;
+
+    JoinTest() {
+        threadA = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    //线程A的任务
+                    //...
+                    try {
+                        threadB.join();//线程A暂停，直到线程B死亡
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //线程A的任务
+                    //...
+                }
+            }
+        });
+        threadB = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //线程B的任务
+                //while (true) {...}
+            }
+        });
+        threadA.start();
+        threadB.start();
+    }
+
+    public static void main(String[] args) {
+        JoinTest joinTest = new JoinTest();
+    }
+}
+```
+
+- Thread.interrupt()使线程停止sleep()或wait()或其他阻塞事件，离开run()方法，结束线程，可用于关闭数据库连接或关闭socket连接
+- setPriority()设置线程优先级
+
+### 线程同步
+
+- 同步块
+```java
+package ThreadTest;
+
+public class SynchronizeBlockTest implements Runnable{
+    public static int num = 0;
+
+    @Override
+    public void run() {
+        while (true) {
+            synchronized ("") {
+                num++;
+                System.out.println(num);
+            }
+        }
+    }
+
+    public static void main(String[] args){
+        SynchronizeBlockTest synchronizeBlockTest = new SynchronizeBlockTest();
+        Thread threadA = new Thread(synchronizeBlockTest);
+        Thread threadB = new Thread(synchronizeBlockTest);
+        Thread threadC = new Thread(synchronizeBlockTest);
+        Thread threadD = new Thread(synchronizeBlockTest);
+
+        threadA.start();
+        threadB.start();
+        threadC.start();
+        threadD.start();
+    }
+}
+```
+
+`synchronized (Object) {}`Object为任意一个对象，每个对象存在一个标志位，并具有两个值，分为0(忙)和1(闲)
+
+
+- `synchronized void f() {}` 同步方法
+
+多个线程都调用synchronized标志的同一方法时，只有一个线程能进入这个方法，其他线程等待
+```java
+package ThreadTest;
+
+public class SynchronizeBlockTest implements Runnable{
+    public static int num = 0;
+
+    @Override
+    public void run() {
+        while (true) {
+            add();
+        }
+    }
+
+    public synchronized void add() {
+        num++;
+        System.out.println(num);
+    }
+
+    public static void main(String[] args){
+        SynchronizeBlockTest synchronizeBlockTest = new SynchronizeBlockTest();
+        Thread threadA = new Thread(synchronizeBlockTest);
+        Thread threadB = new Thread(synchronizeBlockTest);
+        Thread threadC = new Thread(synchronizeBlockTest);
+        Thread threadD = new Thread(synchronizeBlockTest);
+
+        threadA.start();
+        threadB.start();
+        threadC.start();
+        threadD.start();
+    }
+}
+```
+
+## 网络通信
+
+- socket的作用是将应用程序和端口绑定
+
+### TCP
+
+- TCP/IP 交互原理
+
+![tcp-ip服务端与客户端交互.png](tcp-ip服务端与客户端交互.png)
+
+- InetAdress类的常用方法
+
+![InetAdress.png](InetAdress.png)
+
+- ServerSocket类的常用方法
+
+![ServerSocket.png](ServerSocket.png)
+
+服务器代码：
+```java
+package TCP;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import static java.lang.Thread.sleep;
+
+public class server {
+    public static final int PORT = 9988;
+    private ServerSocket serverSocket;
+//    private Thread thread;
+    private int threadNumber = 0;//socket计数器
+    private Socket socket;
+
+    server() {
+        try {
+            serverSocket = new ServerSocket(PORT);
+
+            while (true) {
+                socket = serverSocket.accept();
+                getClientMessage(socket, threadNumber);
+                replyClientMessage(socket, threadNumber);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+//        thread = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (true) {
+//                    try {
+//                        Socket socket = serverSocket.accept();          //阻塞，等待消息
+//                        threadNumber++;
+//                        Thread threadObj = new Thread(new Runnable() {  //获取到消息后另起子线程接收和回复
+//                            private int number = threadNumber;
+//                            Socket socketTHD = socket;
+//                            @Override
+//                            public void run() {
+//                                try {                                   //捕捉终止异常
+//                                    while (true) {
+//                                        getClientMessage(socketTHD, number);
+//                                        replyClientMessage(socketTHD, number);
+//                                    }
+//                                }
+//                                catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                                if (null != socketTHD){
+//                                    try {
+//                                        socketTHD.close();
+//                                    }
+//                                    catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                        });
+//                        threadObj.start();//启动子线程
+//                    }
+//                    catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        });
+//    }
+//
+//    public void startProcess() {
+//        thread.start();
+//    }
+//
+//    public void stopProcess() {
+//        if (null != serverSocket) {
+//            try {
+//                serverSocket.close();
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    //接收
+    private void getClientMessage(Socket socket, int number) {
+        try {
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String msg = bufferedReader.readLine();
+            System.out.println("thread" + number + "receive msg:\n" + msg);
+            //bufferedReader.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //回复
+    public void replyClientMessage(Socket socket, int number) {
+        try {
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+            printWriter.println("thread" + number + "reply msg: ok");
+            printWriter.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        server s = new server();
+//        s.startProcess();
+//        try {
+//            sleep(50000);
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        //s.stopProcess();
+        System.out.println("服务程序退出");
+    }
+}
+```
+
+客户端代码：
+```java
+package TCP;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+public class client extends JFrame {
+    private JTextArea showText = new JTextArea();
+    private JTextField inputText = new JTextField();
+    private Container container;
+    private PrintWriter printWriter;
+    private Socket socket;
+    private BufferedReader bufferedReader;
+
+    public client () {
+        super("client");
+        WindowManage();
+    }
+
+    private void WindowManage() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        container = this.getContentPane();
+        final JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBorder(new BevelBorder(BevelBorder.RAISED));
+        getContentPane().add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setViewportView(showText);
+        container.add(inputText, "South");
+        inputText.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    socket = new Socket("127.0.0.1", 9988);
+                    bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    printWriter = new PrintWriter(socket.getOutputStream(),true);
+                    showText.append(inputText.getText() + '\n');
+                    printWriter.println(inputText.getText());
+                    showText.setSelectionEnd(showText.getText().length());
+                    inputText.setText("");
+                    showText.append("connect complete\n");
+                    showText.append("reply msg: \n" + bufferedReader.readLine() + '\n');
+                }
+                catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void connect() {
+        showText.append("try to connect\n");
+        try {
+            socket = new Socket("127.0.0.1", 9988);
+            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            //printWriter = new PrintWriter(socket.getOutputStream(),true);
+            showText.append("connect complete\n");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void communicate() {
+        try {
+            while (true) {
+                printWriter = new PrintWriter(socket.getOutputStream(),true);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        client c1 = new client();
+        c1.setSize(500, 500);
+        c1.setVisible(true);
+        //c1.connect();
+        //c1.communicate();
+    }
+}
+```
+
+### UDP
+
+- 发送流程
+    - DatagramSocket()创建数据包 发送socket
+    - DatagramPacket(byte[] buf, int offset, int length, InetAddress inetAddress, int port)打包发送数据
+    - DatagramSocket类的send()方法发送数据包
+- 接收流程
+    - DatagramSocket(port)创建数据包 接收socket
+    - DatagramPacket(byte[] buf, int length)开辟数据包接收空间
+    - DatagramSocket类的receive()方法接收数据包
+- MulticastSocket是DatagramSocket的子类
+- 要广播或接收广播的主机地址必须加入同一个广播组，地址范围为224.0.0.0~224.255.255.255
+
+服务器代码：
+```java
+package server;
+
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+
+public class server extends Thread {
+    public final static int PORT = 199;
+    public final static String ADDRESS = "224.255.10.0";
+
+    int port = PORT;
+    InetAddress inetAddress = null;
+    MulticastSocket multicastSocket = null;
+    server(){
+        try{
+            inetAddress = InetAddress.getByName(ADDRESS);
+            multicastSocket = new MulticastSocket(port);
+            multicastSocket.setTimeToLive(1);       //指定发送范围是本地网络
+            multicastSocket.joinGroup(inetAddress); //加入广播组
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void run(){
+        int count  = 1000;
+        while(true){
+            String msg = Integer.toString(count++);
+            byte[] data = msg.getBytes();
+            DatagramPacket datagramPacket = new DatagramPacket(data, data.length, inetAddress, port);
+            System.out.println(new String(data));
+            try {
+                multicastSocket.send(datagramPacket);
+                sleep(count);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void main(String[] args){
+        server s = new server();
+        s.start();
+    }
+}
+```
+
+客户端代码：
+```java
+package client;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
+
+public class client extends JFrame implements Runnable, ActionListener {
+    public final static int PORT = 199;
+    public final static String ADDRESS = "224.255.10.0";
+    InetAddress inetAddress = null;
+    MulticastSocket multicastSocket = null;
+    Thread thread;
+    boolean endThread = false;
+    JButton startButton = new JButton("start");
+    JButton stopButton = new JButton("stop");
+    JTextArea currentMsgText = new JTextArea(10, 10);
+    JTextArea historyMsgText = new JTextArea(10, 10);
+    JPanel panelTop = new JPanel();
+    JPanel panelBottom = new JPanel();
+
+    public client() {
+        super("broadcast");
+        WindowStyle();      //布局设置
+        thread = new Thread(this);
+        try {
+            inetAddress = InetAddress.getByName(ADDRESS);
+            multicastSocket = new MulticastSocket(PORT);
+            multicastSocket.joinGroup(inetAddress);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        while (false == endThread) {
+            byte[] dataReceive = new byte[10240];
+            DatagramPacket datagramPacket = new DatagramPacket(dataReceive, dataReceive.length, inetAddress, PORT);
+            try {
+                multicastSocket.receive(datagramPacket);
+                String msg = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+                SetMsgToShow(msg);  //显示消息到界面
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void actionPerformed(ActionEvent e){
+        if (e.getSource() == startButton) {
+            startButton.setBackground(Color.gray);
+            stopButton.setBackground(Color.white);
+            if (false == thread.isAlive()) {
+                thread = new Thread(this);
+            }
+            endThread = false;
+            thread.start();
+        }
+        if (e.getSource() == stopButton) {
+            startButton.setBackground(Color.white);
+            stopButton.setBackground(Color.gray);
+            endThread = true;
+        }
+    }
+
+    public void WindowStyle(){
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        startButton.addActionListener(this);
+        stopButton.addActionListener(this);
+        currentMsgText.setForeground(Color.BLUE);
+        panelTop.add(startButton);
+        panelTop.add(stopButton);
+        add(panelTop, BorderLayout.NORTH);
+        panelBottom.setLayout(new GridLayout(1,2));
+        panelBottom.add(currentMsgText);
+        panelBottom.add(historyMsgText);
+        add(panelBottom, BorderLayout.CENTER);
+        validate();
+        setBounds(100,50,360,380);
+        setVisible(true);
+    }
+
+    public void SetMsgToShow(String msg) {
+        currentMsgText.setText("receive：\n" + msg);
+        historyMsgText.append(msg + "\n");
+    }
+
+    public static void main(String[] args) {
+        client c = new client();
+        c.setSize(500, 800);
+    }
+}
+```
+
+
+## 数据库
+
+```java
+package ThreadTest;
+import java.sql.*;
+
+public class SQLTest {
+    public static void main(String[] args){
+        try {
+            //数据库连接对象
+            Connection connection = DriverManager.getConnection("xcgj:mysql:" + "//127.0.0.1:5507/test", "userName", "passWord");
+            Statement statement = connection.createStatement();//查询语句的对象
+            ResultSet resultSet = statement.executeQuery("select * from tb_xcgj");
+            while (resultSet.next()){//单行数据查询
+                String id = resultSet.getString("id");//查询此行的某列字段的数据
+                String name = resultSet.getString(2);//查询第二列
+            }
+
+            //模糊查询 _:一个字符  %:0-多个字符
+            resultSet = statement.executeQuery("select * from tb_xcgj where name like 张_%");
+
+            //预处理查询,先格式化查询语句对象，用的时候再赋值查询
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from tb_xcgj where id = ?");
+            preparedStatement.setObject(1, "33");//1代表第一个"?"
+            resultSet = preparedStatement.executeQuery();
+
+            //增删改 insert update delete
+            preparedStatement = connection.prepareStatement("inser into tb_xcgj values(?,?,?)");
+            preparedStatement.setString(1, "rbmw");
+            preparedStatement.setInt(2, 20);
+            preparedStatement.setDouble(3, 0.01);
+            preparedStatement.executeUpdate();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
